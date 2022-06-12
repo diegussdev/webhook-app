@@ -87,7 +87,7 @@ Route::get('/webhook/generate', function () {
     $sessionUUID = session()->get('uuid');
 
     if (!$sessionUUID) {
-        return redirect('/');
+        return response();
     }
 
     $client = new GuzzleHttp\Client();
@@ -127,13 +127,13 @@ Route::get('/webhook/generate', function () {
         }
     }
 
-    return redirect('/');
+    return response();
 });
 
 Route::any('/webhook/clear', function () {
     $sessionUUID = session()->get('uuid');
     Cache::forget($sessionUUID);
-    return redirect('/');
+    return response();
 });
 
 
@@ -141,7 +141,7 @@ Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, 
     $hasUUID = Cache::has($uuid);
 
     if (!$hasUUID) {
-        return redirect('/');
+        return response();
     }
 
     $requestUUID = (string) Str::uuid();
