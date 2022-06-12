@@ -18,7 +18,6 @@ use Illuminate\Support\Str;
 */
 
 Route::get('/', function (Request $request) {
-    dd($request->secure);
     $sessionUUID = session()->get('uuid');
     $oneDayExpiration = 60 * 60 * 24;
     $expireAt = time() + $oneDayExpiration;
@@ -32,11 +31,11 @@ Route::get('/', function (Request $request) {
     }
 
     $fakeRequester = $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
-    $generateRequestUrl = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/generate";
-    $clearRequestsUrl = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/clear";
-    $webhook = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
-    $flush = $protocol . $_SERVER['HTTP_HOST'] . '/webhook/flush';
-    $getRequestsUrl = $protocol . $_SERVER['HTTP_HOST'] . '/webhook/requests';
+    $generateRequestUrl = $_SERVER['HTTP_HOST'] . "/webhook/generate";
+    $clearRequestsUrl = $_SERVER['HTTP_HOST'] . "/webhook/clear";
+    $webhook = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
+    $flush = $_SERVER['HTTP_HOST'] . '/webhook/flush';
+    $getRequestsUrl = $_SERVER['HTTP_HOST'] . '/webhook/requests';
     $cache = json_decode(Cache::get($sessionUUID), true);
     $requests = [];
 
