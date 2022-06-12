@@ -125,3 +125,51 @@ Route::any('/fakerequest', function (Request $request) {
 
     return response()->json($response, $code);
 });
+
+// Generate fake webhook requests
+Route::get('/generateWebhookRequests', function () {
+    $sessionUUID = session()->get('uuid');
+
+    if (!$sessionUUID) {
+        return response('', 404);
+    }
+
+    $client = new GuzzleHttp\Client();
+
+    $methods = [
+        'GET' => 200,
+        'POST' => 201,
+        'PUT' => 204,
+        'PATCH' => 204,
+        'DELETE' => 204
+    ];
+    
+    $options = [
+        'headers' => [
+            'Authorization' => 'Bearer MyTokenTest'
+        ],
+        'form_params' => [
+            'id' => 123,
+            'status' => 12345
+        ]
+
+    ];
+
+    $data = [];
+    foreach ($methods as $method => $code) {
+        $url = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/{$code}";
+
+        try {
+            $response = $client->request($method, $url, $options);
+            $data[$method] = [
+                'statusCode' => $response->getStatusCode()
+            ];
+        } catch (Exception $e) {
+            $data[$method] = [
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    return response()->json($data);
+});
