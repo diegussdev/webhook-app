@@ -1,7 +1,7 @@
 <div class="accordion-item" id="itemRequest-{{ $key }}">
     <h2 class="accordion-header" id="panelsStayOpen-headingRequest-{{ $key }}">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseRequest-{{ $key }}" aria-expanded="false" aria-controls="panelsStayOpen-collapseRequest-{{ $key }}">
-            {{ $request['method'] }} @if ($request['origin']) - {{ $request['origin'] }} @endif - {{ date('Y/m/d H:i:s', $request['datetime']); }}
+            {{ $request['method'] }} @if ($request['origin']) - {{ $request['origin'] }} @endif - {{ date('Y/m/d h:i:s A', $request['datetime']); }}
         </button>
     </h2>
     <div id="panelsStayOpen-collapseRequest-{{ $key }}" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingRequest-{{ $key }}" >
