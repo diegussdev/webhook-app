@@ -29,10 +29,10 @@ Route::get('/', function () {
         
         Cache::put($sessionUUID, json_encode(['expireAt' => $expireAt]), $oneDayExpiration);
     }
-
-    $fakeRequester = $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
-    $webhook = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
-    $flush = $_SERVER['HTTP_HOST'] . '/webhook/flush';
+    $protocol = strtolower(current(explode('/', $_SERVER['SERVER_PROTOCOL']))) . "://";
+    $fakeRequester = $protocol . $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
+    $webhook = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
+    $flush = $protocol . $_SERVER['HTTP_HOST'] . '/webhook/flush';
     $cache = json_decode(Cache::get($sessionUUID), true);
     $requests = [];
 
@@ -93,7 +93,8 @@ Route::get('/webhook/generate', function () {
 
     $data = [];
     foreach ($methods as $method => $code) {
-        $url = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/{$code}";
+        $protocol = strtolower(current(explode('/', $_SERVER['SERVER_PROTOCOL']))) . "://";
+        $url = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/{$code}";
 
         try {
             $response = $client->request($method, $url, $options);
