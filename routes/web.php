@@ -82,13 +82,13 @@ Route::get('/webhook/generate', function () {
     
     $options = [
         'headers' => [
-            'Authorization' => 'Bearer MyTokenTest'
+            'Authorization' => 'Bearer MyTokenTest',
+            'Content-Type' => 'application/json'
         ],
-        'form_params' => [
+        'body' => json_encode([
             'id' => 123,
             'status' => 12345
-        ]
-
+        ])
     ];
 
     $data = [];
