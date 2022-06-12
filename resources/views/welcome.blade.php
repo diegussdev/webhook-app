@@ -132,7 +132,7 @@
 
             function loadRequests() {
                 $.ajax({
-                    url: "{{ $getRequestsUrl }}",
+                    url: "/webhook/requests",
                 })
                 .done(function(response) {
                     if (response) {

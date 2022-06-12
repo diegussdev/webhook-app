@@ -33,7 +33,6 @@ Route::get('/', function (Request $request) {
     $fakeRequester = $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
     $webhook = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
     $flush = $_SERVER['HTTP_HOST'] . '/webhook/flush';
-    $getRequestsUrl = $_SERVER['HTTP_HOST'] . '/webhook/requests';
     $cache = json_decode(Cache::get($sessionUUID), true);
     $requests = [];
 
@@ -49,7 +48,6 @@ Route::get('/', function (Request $request) {
 
     $data = [
         'expireAt' => $expireAt,
-        'getRequestsUrl' => $getRequestsUrl,
         'FakeRequester' => [
             'url' => $fakeRequester,
         ],
