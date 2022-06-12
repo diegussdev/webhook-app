@@ -155,9 +155,9 @@
             function reloadRequests(url) {
                 $.ajax({
                     url: url,
+                }).done(function () {
+                    $('#accordionPanelRequest').html('');
                 });
-
-                $('#accordionPanelRequest').html('');
             }
 
             function copy(text, target) {
