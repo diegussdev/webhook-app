@@ -41,63 +41,69 @@
             }
         </style>
     </head>
-    <body class="p-4">
+    <body class="p-4 text-bg-dark">
 
         <div class="container-sm text-center">
-            <h1 class="fw-bold m-0">Webhook App</h1>
-            <div id="watch" class="opacity-0">00:00:00 AM</div>
+            <h1 class="fw-bold m-0 h2">Webhook App</h1>
+            <div id="watch" class="opacity-0 fs-6">00:00:00 AM</div>
         </div>
 
-        <div class="container-sm text-bg-light p-3 rounded-2 mt-2">
-            <div class="container d-flex justify-content-between">
-                <h4 class="fw-bold">Fake Requester</h4>
-            </div>
-
-            <div class="container mt-2">
-                <input onclick="copy('{{ $FakeRequester['url'] }}','#fakeRequesterUrl')" type="text" class="form-control text-center" id="fakeRequesterUrl" value="{{ $FakeRequester['url'] }}" readonly>
-            </div>
-
-            <div class="container mt-2">
-                <p class="m-0"><i class="fa-solid fa-circle-info"></i> code = HTTP_CODE that will be returned</p>
-                <p class="m-0"><i class="fa-solid fa-circle-info"></i> timeout = Seconds to wait for response</p>
-                <p class="m-0"><i class="fa-solid fa-circle-info"></i> The request body will be returned in the response</p>
-            </div>
-        </div>
-
-        <div class="container-sm text-bg-light mt-2 p-3 rounded-2">
+        <div class="container-sm text-bg-dark border border-2 border-secondary text-gray shadow p-3 rounded-2 mt-3">
             <div class="container">
-                <h4 class="fw-bold">Webhook</h4>
+                <div class="d-flex justify-content-between m-0 p-0">
+                    <h4 class="fw-bold">Fake Requester</h4>
+                    <button onclick="copy('{{ $FakeRequester['url'] }}','#fakeRequesterUrl')" class="bg-transparent text-light ml-2 fw-bold" style="cursor: pointer"><i class="fa-solid fa-copy"></i><span class="ml-1" style="font-size: 10px">Copy</span></button>
+                </div>
+            </div>
+
+            <div class="container">
+                <input type="text" class="form-control text-center text-bg-dark" style="cursor: pointer" id="fakeRequesterUrl" value="{{ $FakeRequester['url'] }}" readonly>
+            </div>
+
+            <div class="container mt-2 ml-2">
+                <p class="m-0" style="font-size: 12px"><i class="fa-solid fa-circle-info"></i> code = HTTP_CODE that will be returned</p>
+                <p class="m-0" style="font-size: 12px"><i class="fa-solid fa-circle-info"></i> timeout = Seconds to wait for response</p>
+                <p class="m-0" style="font-size: 12px"><i class="fa-solid fa-circle-info"></i> The request body will be returned in the response</p>
+            </div>
+        </div>
+
+        <div class="container-sm text-bg-dark border border-2 border-secondary shadow mt-2 p-3 rounded-2">
+            <div class="container">
+                <div class="d-flex justify-content-between m-0 p-0">
+                    <h4 class="fw-bold">Webhook</h4>
+                    <button onclick="copy('{{ $Webhook['url'] }}','#webhookUrl')" class="bg-transparent text-light ml-2 fw-bold" style="cursor: pointer"><i class="fa-solid fa-copy"></i><span class="ml-1" style="font-size: 10px">Copy</span></button>
+                </div>
             </div>
             
-            <div class="container mt-2">
-                <input onclick="copy('{{ $Webhook['url'] }}','#webhookUrl')" type="text" class="form-control text-center" id="webhookUrl" value="{{ $Webhook['url'] }}" readonly>
+            <div class="container">
+                <input type="text" class="form-control text-center text-bg-dark" style="cursor: pointer" id="webhookUrl" value="{{ $Webhook['url'] }}" readonly>
             </div>
 
-            <div class="container mt-2">
-                <p class="m-0"><i class="fa-solid fa-circle-info"></i> You can set return HTTP_CODE in the last path param</p>
+            <div class="container mt-2 ml-2">
+                <p class="m-0" style="font-size: 12px"><i class="fa-solid fa-circle-info"></i> You can set return HTTP_CODE in the last path param</p>
             </div>
         </div>
 
-        <div class="container-sm text-bg-light mt-2 p-3 rounded-2">
-            <div class="container d-flex flex-wrap justify-content-between align-items-center mb-2">
-                <button class="btn btn-outline-primary btn-sm" type="button" disabled>
+        <div class="container-sm shadow mt-4 p-0 rounded-2">
+            <div class="container d-flex flex-column flex-sm-row gap-2 flex-wrap justify-content-sm-between justify-content-center align-items-center py-0 px-4 mb-2">
+                <button class="btn btn-outline-light btn-md border-0" type="button" disabled>
                     <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
                     <span class="ml-2">Loading Requests...</span>
                     
                 </button>
                 <div class="d-flex justify-content-center align-items-center gap-2">
-                    <button class="btn btn-outline-success btn-sm" onclick="reloadRequests('/webhook/generate')">
+                    <button class="btn btn-success btn-sm" onclick="reloadRequests('/webhook/generate')">
                         <i class="fa-solid fa-plus"></i>
                         Generate
                     </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="reloadRequests('/webhook/clear')">
+                    <button class="btn btn-danger btn-sm" onclick="reloadRequests('/webhook/clear')">
                         <i class="fa-solid fa-trash-can"></i>
                         Clear
                     </button>
                 </div>
             </div>
 
-            <div class="container mt-2">
+            <div class="container p-0 mt-2">
                 <div class="card card-body bg-transparent border-0 p-0">
                     <div class="accordion" id="accordionPanelRequest">
                         @foreach (array_reverse($Webhook['requests']) as $key => $request)
@@ -163,9 +169,9 @@
             }
 
             function copy(text, target) {
-                $(target).val('Copied!').addClass('text-success');
+                $(target).val('Copied!').addClass('bg-success').addClass('text-light');
                 setTimeout(() => {
-                    $(target).val(text).removeClass('text-success');
+                    $(target).val(text).removeClass('bg-success').removeClass('text-light');
                 }, 1000);
                 
                 var input = document.createElement('input');

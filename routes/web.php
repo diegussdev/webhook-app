@@ -155,6 +155,8 @@ Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, 
         return response('', 200);
     }
 
+    $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
+
     $requestUUID = (string) Str::uuid();
     $currentRequest = [
         'id' => $requestUUID,
@@ -164,15 +166,13 @@ Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, 
         'query' => $request->query() ? json_encode($request->query()) : null,
         'body' => $request->post() ? json_encode($request->post()) : null,
         'headers' => $request->header() ? json_encode($request->header()) : null,
+        'responseCode' =>  "{$code} - " . JsonResponse::$statusTexts[$code]
     ];
     
     $data = json_decode(Cache::get($uuid), true);
     $expireAt = (int) $data['expireAt'] - time();
 
     $data['requests'][$requestUUID] = $currentRequest;
-
-
-    $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
     
     Cache::put($uuid, json_encode($data), $expireAt);
     return response('', $code);
