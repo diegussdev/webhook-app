@@ -132,7 +132,18 @@ Route::get('/webhook/generate', function () {
 
 Route::any('/webhook/clear', function () {
     $sessionUUID = session()->get('uuid');
-    Cache::forget($sessionUUID);
+
+    if (!Cache::has($sessionUUID)) {
+        return response('', 200);
+    }
+
+    $data = json_decode(Cache::get($sessionUUID), true);
+    $data['requests'] = [];
+    $expireAt = (int) $data['expireAt'] - time();
+    $data['requests'] = [];
+
+    Cache::put($sessionUUID, json_encode($data), $expireAt);
+
     return response('', 200);
 });
 

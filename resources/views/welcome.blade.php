@@ -135,7 +135,7 @@
                     url: "/webhook/requests",
                 })
                 .done(function(response) {
-                    if (response) {
+                    if (response && Object.keys(response).length > 0) {
                         for (var key in response) {
                             if (!response.hasOwnProperty(key)) {
                                 continue;
@@ -148,16 +148,18 @@
                             var element = response[key];
                             $('#accordionPanelRequest').prepend(element);
                         }
+                        
+                        return;
                     }
+
+                    $('#accordionPanelRequest').html('');
                 });
             }
 
             function reloadRequests(url) {
                 $.ajax({
                     url: url,
-                }).done(function () {
-                    $('#accordionPanelRequest').html('');
-                });
+                })
             }
 
             function copy(text, target) {
