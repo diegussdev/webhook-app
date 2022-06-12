@@ -15,4 +15,4 @@
 - Permite definir o codigo HTTP de retorno pela url do Webhook
 - A rota '/webhook/generate' gera uma requisição para cada método HTTP para testar o recebimento dos Webhooks
 
-![Webhook App](/webhookapp.png "Webhook App")
+![Webhook App](/webhookappprint.png "Webhook App")
