@@ -158,11 +158,8 @@ Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, 
     $data = json_decode(Cache::get($uuid), true);
     $expireAt = (int) $data['expireAt'] - time();
 
-    if (array_key_exists('requests', $data)) {
-        $data['requests'] = array_merge([$requestUUID => $currentRequest], $data['requests']);
-    } else {
-        $data['requests'][$requestUUID] = $currentRequest;
-    }
+    $data['requests'][$requestUUID] = $currentRequest;
+
 
     $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
     

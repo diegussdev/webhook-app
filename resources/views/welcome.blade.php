@@ -100,7 +100,7 @@
             <div class="container mt-2">
                 <div class="card card-body bg-transparent border-0 p-0">
                     <div class="accordion" id="accordionPanelRequest">
-                        @foreach ($Webhook['requests'] as $key => $request)
+                        @foreach (array_reverse($Webhook['requests']) as $key => $request)
                             @include('request', ['request' => $request])
                         @endforeach
                     </div>
@@ -146,7 +146,7 @@
                             }
 
                             var element = response[key];
-                            $('#accordionPanelRequest').prepend(element); 
+                            $('#accordionPanelRequest').prepend(element);
                         }
                     }
                 });
