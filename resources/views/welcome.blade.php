@@ -43,12 +43,12 @@
     </head>
     <body class="p-4 text-bg-dark">
 
-        <div class="container-sm text-center">
+        <div style="max-width: 1024px" class="container-sm text-center">
             <h1 class="fw-bold m-0 h2">Webhook App</h1>
             <div id="watch" class="opacity-0 fs-6">00:00:00 AM</div>
         </div>
 
-        <div class="container-sm text-bg-dark border border-2 border-secondary text-gray shadow p-3 rounded-2 mt-3">
+        <div style="max-width: 1024px" class="container-sm text-bg-dark border border-2 border-secondary text-gray shadow p-3 rounded-2 mt-3">
             <div class="container">
                 <div class="d-flex justify-content-between m-0 p-0">
                     <h4 class="fw-bold">Fake Requester</h4>
@@ -67,7 +67,7 @@
             </div>
         </div>
 
-        <div class="container-sm text-bg-dark border border-2 border-secondary shadow mt-2 p-3 rounded-2">
+        <div style="max-width: 1024px" class="container-sm text-bg-dark border border-2 border-secondary shadow mt-2 p-3 rounded-2">
             <div class="container">
                 <div class="d-flex justify-content-between m-0 p-0">
                     <h4 class="fw-bold">Webhook</h4>
@@ -84,7 +84,7 @@
             </div>
         </div>
 
-        <div class="container-sm shadow mt-4 p-0 rounded-2">
+        <div style="max-width: 1024px" class="container-sm shadow mt-4 p-0 rounded-2">
             <div class="container d-flex flex-column flex-sm-row gap-2 flex-wrap justify-content-sm-between justify-content-center align-items-center py-0 px-4 mb-2">
                 <button class="btn btn-outline-light btn-md border-0" type="button" disabled>
                     <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
