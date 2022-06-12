@@ -29,7 +29,7 @@ Route::get('/', function () {
         
         Cache::put($sessionUUID, json_encode(['expireAt' => $expireAt]), $oneDayExpiration);
     }
-    $protocol = strtolower(current(explode('/', $_SERVER['SERVER_PROTOCOL']))) . "://";
+    $protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))=='https'? 'https://':'http://';
     $fakeRequester = $protocol . $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
     $webhook = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
     $flush = $protocol . $_SERVER['HTTP_HOST'] . '/webhook/flush';
@@ -115,7 +115,7 @@ Route::get('/webhook/generate', function () {
 
     $data = [];
     foreach ($methods as $method => $code) {
-        $protocol = strtolower(current(explode('/', $_SERVER['SERVER_PROTOCOL']))) . "://";
+        $protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))=='https'?'https://':'http://';
         $url = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/{$code}";
 
         try {
