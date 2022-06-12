@@ -17,7 +17,8 @@ use Illuminate\Support\Str;
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
+    dd($request->secure);
     $sessionUUID = session()->get('uuid');
     $oneDayExpiration = 60 * 60 * 24;
     $expireAt = time() + $oneDayExpiration;
@@ -30,8 +31,7 @@ Route::get('/', function () {
         Cache::put($sessionUUID, json_encode(['expireAt' => $expireAt]), $oneDayExpiration);
     }
 
-    $protocol = isset($_SERVER["HTTPS"]) ?'https://':'http://';
-    $fakeRequester = $protocol . $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
+    $fakeRequester = $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
     $generateRequestUrl = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/generate";
     $clearRequestsUrl = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/clear";
     $webhook = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
@@ -120,8 +120,7 @@ Route::get('/webhook/generate', function () {
 
     $data = [];
     foreach ($methods as $method => $code) {
-        $protocol = isset($_SERVER["HTTPS"]) ?'https://':'http://';
-        $url = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/{$code}";
+        $url = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/{$code}";
 
         try {
             $response = $client->request($method, $url, $options);
