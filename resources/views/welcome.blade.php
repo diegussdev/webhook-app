@@ -44,10 +44,11 @@
     <body class="p-4">
 
         <div class="container-sm text-center">
-            <h1 class="fw-bold">Webhook App</h1>
+            <h1 class="fw-bold m-0">Webhook App</h1>
+            <div id="watch" class="opacity-0">00:00:00 AM</div>
         </div>
 
-        <div class="container-sm text-bg-light p-3 rounded-2">
+        <div class="container-sm text-bg-light p-3 rounded-2 mt-2">
             <div class="container d-flex justify-content-between">
                 <h4 class="fw-bold">Fake Requester</h4>
             </div>
@@ -148,6 +149,21 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
+            var myVar = setInterval(myTimer ,1000);
+            
+            function myTimer() {
+                var d = new Date(), displayDate;
+
+                if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                    displayDate = d.toLocaleTimeString('en');
+                } else {
+                    displayDate = d.toLocaleTimeString('en', {timeZone: 'UTC'});
+                }
+
+                $("#watch").html(displayDate + ' - UTC');
+                $("#watch").removeClass('opacity-0');
+            }
+
             function copy(text, target) {
                 $(target).val('Copied!').addClass('text-success');
                 setTimeout(() => {
