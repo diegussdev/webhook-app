@@ -87,7 +87,7 @@ Route::get('/webhook/generate', function () {
     $sessionUUID = session()->get('uuid');
 
     if (!$sessionUUID) {
-        return response();
+        return response('', 200);
     }
 
     $client = new GuzzleHttp\Client();
