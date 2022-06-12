@@ -86,11 +86,11 @@
                     
                 </button>
                 <div class="d-flex justify-content-center align-items-center gap-2">
-                    <button class="btn btn-outline-success btn-sm" onclick="reloadRequests('/webhook/generate')">
+                    <button class="btn btn-outline-success btn-sm" onclick="reloadRequests('{{ $generateRequestUrl }}')">
                         <i class="fa-solid fa-plus"></i>
                         Generate
                     </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="reloadRequests('/webhook/clear')">
+                    <button class="btn btn-outline-danger btn-sm" onclick="reloadRequests('{{ $clearRequestsUrl }}')">
                         <i class="fa-solid fa-trash-can"></i>
                         Clear
                     </button>

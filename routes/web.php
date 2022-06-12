@@ -29,8 +29,11 @@ Route::get('/', function () {
         
         Cache::put($sessionUUID, json_encode(['expireAt' => $expireAt]), $oneDayExpiration);
     }
-    $protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))=='https'? 'https://':'http://';
+
+    $protocol = isset($_SERVER["HTTPS"]) ?'https://':'http://';
     $fakeRequester = $protocol . $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
+    $generateRequestUrl = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/generate";
+    $clearRequestsUrl = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/clear";
     $webhook = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
     $flush = $protocol . $_SERVER['HTTP_HOST'] . '/webhook/flush';
     $getRequestsUrl = $protocol . $_SERVER['HTTP_HOST'] . '/webhook/requests';
@@ -50,6 +53,8 @@ Route::get('/', function () {
     $data = [
         'expireAt' => $expireAt,
         'getRequestsUrl' => $getRequestsUrl,
+        'generateRequestUrl' => $generateRequestUrl,
+        'clearRequestsUrl' => $clearRequestsUrl,
         'FakeRequester' => [
             'url' => $fakeRequester,
         ],
@@ -115,7 +120,7 @@ Route::get('/webhook/generate', function () {
 
     $data = [];
     foreach ($methods as $method => $code) {
-        $protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))=='https'?'https://':'http://';
+        $protocol = isset($_SERVER["HTTPS"]) ?'https://':'http://';
         $url = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/{$code}";
 
         try {
