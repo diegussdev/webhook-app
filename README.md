@@ -12,3 +12,5 @@
 - Armazenar requisições em cache
 - Exibir requisições recebidas
 - Permite limpar dados em cache referentes ao endpoint armazenado na seção
+- Permite definir o codigo HTTP de retorno pela url do Webhook
+- A rota '/generateWebhookRequests' gera uma requisição para cada método HTTP para testar o recebimento dos Webhooks
