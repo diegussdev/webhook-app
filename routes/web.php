@@ -31,8 +31,6 @@ Route::get('/', function (Request $request) {
     }
 
     $fakeRequester = $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
-    $generateRequestUrl = $_SERVER['HTTP_HOST'] . "/webhook/generate";
-    $clearRequestsUrl = $_SERVER['HTTP_HOST'] . "/webhook/clear";
     $webhook = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
     $flush = $_SERVER['HTTP_HOST'] . '/webhook/flush';
     $getRequestsUrl = $_SERVER['HTTP_HOST'] . '/webhook/requests';
@@ -52,8 +50,6 @@ Route::get('/', function (Request $request) {
     $data = [
         'expireAt' => $expireAt,
         'getRequestsUrl' => $getRequestsUrl,
-        'generateRequestUrl' => $generateRequestUrl,
-        'clearRequestsUrl' => $clearRequestsUrl,
         'FakeRequester' => [
             'url' => $fakeRequester,
         ],
