@@ -30,8 +30,8 @@ Route::get('/', function () {
         Cache::put($sessionUUID, json_encode(['expireAt' => $expireAt]), $oneDayExpiration);
     }
 
-    $fakeRequester = $_SERVER['HTTP_HOST'] . '/fakerequest';
-    $webhook = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}";
+    $fakeRequester = $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
+    $webhook = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
     $flush = $_SERVER['HTTP_HOST'] . '/webhook/flush';
     $cache = json_decode(Cache::get($sessionUUID), true);
     $requests = [];
@@ -50,88 +50,24 @@ Route::get('/', function () {
         'expireAt' => $expireAt,
         'FakeRequester' => [
             'url' => $fakeRequester,
-            'availableQueryParams' => [
-                'code' => 'HTTP_CODE',
-                'timeout' => 'Seconds to wait for response'
-            ],
-            'info' => 'The request body will be returned in the response'
         ],
         'Webhook' => [
             'url' => $webhook,
-            'urlToDefineHttpCodeResponse' => "{$webhook}/{HTTP_CODE_HERE}",
             'flush' => $flush,
-            'resquests' => $requests
+            'requests' => $requests
         ]
         
     ];
 
-    return response()->json($data, 200);
-});
-
-Route::any('/webhook/flush', function () {
-    $sessionUUID = session()->get('uuid');
-    Cache::forget($sessionUUID);
-    return response('', 200);
-});
-
-
-Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, $code = 200) {
-    $hasUUID = Cache::has($uuid);
-
-    if (!$hasUUID) {
-        return response('', 404);
-    }
-
-    $currentRequest = [
-        'origin' => $request->headers->get('origin'),
-        'method' => $request->method(),
-        'datetime' => time(),
-        'query' => json_encode($request->query()),
-        'body' => json_encode($request->post()),
-        'headers' => json_encode($request->header()),
-    ];
-    
-    $data = json_decode(Cache::get($uuid), true);
-
-    $expireAt = (int) $data['expireAt'] - time();
-
-    if (array_key_exists('requests', $data)) {
-        array_unshift($data['requests'], $currentRequest);
-    } else {
-        $data['requests'][] = $currentRequest;
-    }
-
-    $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
-    
-    Cache::put($uuid, json_encode($data), $expireAt);
-    return response('', $code);
-});
-
-Route::any('/fakerequest', function (Request $request) {    
-    $timeout = (int) $request->input('timeout');
-    
-    if ($timeout) {
-        sleep($timeout);
-    }
-
-    $code = $request->input('code');
-    $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
-
-    $response = (array) $request->post();
-
-    if (!$response) {
-        $response = ['data' => "{$code} - " . JsonResponse::$statusTexts[$code]];
-    }
-
-    return response()->json($response, $code);
+    return view('welcome', $data);
 });
 
 // Generate fake webhook requests
-Route::get('/generateWebhookRequests', function () {
+Route::get('/webhook/generate', function () {
     $sessionUUID = session()->get('uuid');
 
     if (!$sessionUUID) {
-        return response('', 404);
+        return redirect('/');
     }
 
     $client = new GuzzleHttp\Client();
@@ -171,5 +107,63 @@ Route::get('/generateWebhookRequests', function () {
         }
     }
 
-    return response()->json($data);
+    return redirect('/');
+});
+
+Route::any('/webhook/clear', function () {
+    $sessionUUID = session()->get('uuid');
+    Cache::forget($sessionUUID);
+    return redirect('/');
+});
+
+
+Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, $code = 200) {
+    $hasUUID = Cache::has($uuid);
+
+    if (!$hasUUID) {
+        return redirect('/');
+    }
+
+    $currentRequest = [
+        'origin' => $request->headers->get('origin'),
+        'method' => $request->method(),
+        'datetime' => time(),
+        'query' => $request->query() ? json_encode($request->query()) : null,
+        'body' => $request->post() ? json_encode($request->post()) : null,
+        'headers' => $request->header() ? json_encode($request->header()) : null,
+    ];
+    
+    $data = json_decode(Cache::get($uuid), true);
+
+    $expireAt = (int) $data['expireAt'] - time();
+
+    if (array_key_exists('requests', $data)) {
+        array_unshift($data['requests'], $currentRequest);
+    } else {
+        $data['requests'][] = $currentRequest;
+    }
+
+    $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
+    
+    Cache::put($uuid, json_encode($data), $expireAt);
+    return response('', $code);
+});
+
+Route::any('/fakerequest', function (Request $request) {    
+    $timeout = (int) $request->input('timeout');
+    
+    if ($timeout) {
+        sleep($timeout);
+    }
+
+    $code = $request->input('code');
+    $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
+
+    $response = (array) $request->post();
+
+    if (!$response) {
+        $response = ['data' => "{$code} - " . JsonResponse::$statusTexts[$code]];
+    }
+
+    return response()->json($response, $code);
 });

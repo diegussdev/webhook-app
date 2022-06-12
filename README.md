@@ -13,4 +13,7 @@
 - Exibir requisições recebidas
 - Permite limpar dados em cache referentes ao endpoint armazenado na seção
 - Permite definir o codigo HTTP de retorno pela url do Webhook
-- A rota '/generateWebhookRequests' gera uma requisição para cada método HTTP para testar o recebimento dos Webhooks
+- A rota '/webhook/generate' gera uma requisição para cada método HTTP para testar o recebimento dos Webhooks
+
+
+![Webhook App](./storage/app/public/webhookapp.png "Webhook App")
