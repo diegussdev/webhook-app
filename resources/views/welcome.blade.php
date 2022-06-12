@@ -58,11 +58,9 @@
             </div>
 
             <div class="container mt-2">
-                <p class="text-center">
-                    <span class="badge text-bg-primary">code = HTTP_CODE that will be returned</span> 
-                    <span class="badge text-bg-primary">timeout = Seconds to wait for response</span>
-                </p>
-                <p class="text-center m-0"><i class="fa-solid fa-circle-info"></i> The request body will be returned in the response</p>
+                <p class="m-0"><i class="fa-solid fa-circle-info"></i> code = HTTP_CODE that will be returned</p>
+                <p class="m-0"><i class="fa-solid fa-circle-info"></i> timeout = Seconds to wait for response</p>
+                <p class="m-0"><i class="fa-solid fa-circle-info"></i> The request body will be returned in the response</p>
             </div>
         </div>
 
@@ -76,30 +74,26 @@
             </div>
 
             <div class="container mt-2">
-                <p class="text-center m-0">
-                    <span class="badge text-bg-primary">You can set return HTTP_CODE in the last path param</span> 
-                </p>
+                <p class="m-0"><i class="fa-solid fa-circle-info"></i> You can set return HTTP_CODE in the last path param</p>
             </div>
         </div>
 
         <div class="container-sm text-bg-light mt-2 p-3 rounded-2">
-            <div class="container d-flex justify-content-between mb-2">
-                <h4 class="fw-bold">
-                    Requests
-                </h4>
-                <div>
-                    <a class="btn btn-outline-primary btn-sm" href="/">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        Refresh
-                    </a>
-                    <a class="btn btn-outline-success btn-sm" href="/webhook/generate">
+            <div class="container d-flex flex-wrap justify-content-between align-items-center mb-2">
+                <button class="btn btn-outline-primary btn-sm" type="button" disabled>
+                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                    <span class="ml-2">Loading Requests...</span>
+                    
+                </button>
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <button class="btn btn-outline-success btn-sm" onclick="reloadRequests('/webhook/generate')">
                         <i class="fa-solid fa-plus"></i>
                         Generate
-                    </a>
-                    <a class="btn btn-outline-danger btn-sm" href="/webhook/clear">
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="reloadRequests('/webhook/clear')">
                         <i class="fa-solid fa-trash-can"></i>
                         Clear
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -107,36 +101,7 @@
                 <div class="card card-body bg-transparent border-0 p-0">
                     <div class="accordion" id="accordionPanelRequest">
                         @foreach ($Webhook['requests'] as $key => $request)
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="panelsStayOpen-headingRequest-{{ $key }}">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseRequest-{{ $key }}" aria-expanded="false" aria-controls="panelsStayOpen-collapseRequest-{{ $key }}">
-                                        {{ $request['method'] }} @if ($request['origin']) - {{ $request['origin'] }} @endif - {{ date('Y/m/d H:i:s', $request['datetime']); }}
-                                    </button>
-                                </h2>
-                                <div id="panelsStayOpen-collapseRequest-{{ $key }}" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingRequest-{{ $key }}" >
-                                    <div class="accordion-body">
-                                        @if ($request['query'])
-                                            <div class="mb-2">
-                                                <span>Query</span>
-                                                <textarea class="form-control" aria-label="With textarea" onclick="copy('{{ $request['query'] }}','#resquestQuery{{ $key }}')" id="resquestQuery{{ $key }}" readonly>{{ trim($request['query']) }}</textarea>
-                                            </div>
-                                        @endif
-                                        @if ($request['body'])
-                                            <div class="mb-2">
-                                                <span>Body</span>
-                                                <textarea class="form-control" aria-label="With textarea" onclick="copy('{{ $request['body'] }}','#resquestBody{{ $key }}')" id="resquestBody{{ $key }}" readonly>{{ trim($request['body']) }}</textarea>
-                                            </div>
-                                        @endif
-                                        @if ($request['headers'])
-                                            <div class="mb-2">
-                                                <span>Headers</span>
-                                                <textarea class="form-control" aria-label="With textarea" onclick="copy('{{ $request['headers'] }}','#resquestHeader{{ $key }}')" id="resquestHeader{{ $key }}" readonly>{{ trim($request['headers']) }}</textarea>
-                                            </div>
-                                        @endif
-
-                                    </div>
-                                </div>
-                            </div>
+                            @include('request', ['request' => $request])
                         @endforeach
                     </div>
                 </div>
@@ -149,9 +114,10 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-            var myVar = setInterval(myTimer ,1000);
+            var watchTimer = setInterval(loadTimer, 1000);
+            var requestsTimer = setInterval(loadRequests, 1000);
             
-            function myTimer() {
+            function loadTimer() {
                 var d = new Date(), displayDate;
 
                 if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
@@ -162,6 +128,36 @@
 
                 $("#watch").html(displayDate + ' - UTC');
                 $("#watch").removeClass('opacity-0');
+            }
+
+            function loadRequests() {
+                $.ajax({
+                    url: "{{ $getRequestsUrl }}",
+                })
+                .done(function(response) {
+                    if (response) {
+                        for (var key in response) {
+                            if (!response.hasOwnProperty(key)) {
+                                continue;
+                            };
+
+                            if ($(`#itemRequest-${key}`).length) {
+                                continue;
+                            }
+
+                            var element = response[key];
+                            $('#accordionPanelRequest').prepend(element); 
+                        }
+                    }
+                });
+            }
+
+            function reloadRequests(url) {
+                $.ajax({
+                    url: url,
+                });
+
+                $('#accordionPanelRequest').html('');
             }
 
             function copy(text, target) {

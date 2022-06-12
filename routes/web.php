@@ -33,6 +33,7 @@ Route::get('/', function () {
     $fakeRequester = $protocol . $_SERVER['HTTP_HOST'] . '/fakerequest?code=200&timeout=1';
     $webhook = $protocol . $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/200";
     $flush = $protocol . $_SERVER['HTTP_HOST'] . '/webhook/flush';
+    $getRequestsUrl = $protocol . $_SERVER['HTTP_HOST'] . '/webhook/requests';
     $cache = json_decode(Cache::get($sessionUUID), true);
     $requests = [];
 
@@ -48,6 +49,7 @@ Route::get('/', function () {
 
     $data = [
         'expireAt' => $expireAt,
+        'getRequestsUrl' => $getRequestsUrl,
         'FakeRequester' => [
             'url' => $fakeRequester,
         ],
@@ -60,6 +62,26 @@ Route::get('/', function () {
     ];
 
     return view('welcome', $data);
+});
+
+Route::get('/webhook/requests', function () {
+    $sessionUUID = session()->get('uuid');
+
+    $cache = (array) json_decode(Cache::get($sessionUUID), true);
+    $requests = [];
+
+    if ($cache) {
+        $requests = array_key_exists('requests', $cache) 
+            ? $cache['requests']
+            : [];
+    }
+
+    $data = [];
+    foreach ($requests as $key => $request) {
+        $data[$key] = view('request', ['key' => $key, 'request' => $request])->render();
+    }
+
+    return response()->json($data, 200);
 });
 
 // Generate fake webhook requests
@@ -125,7 +147,9 @@ Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, 
         return redirect('/');
     }
 
+    $requestUUID = (string) Str::uuid();
     $currentRequest = [
+        'id' => $requestUUID,
         'origin' => $request->headers->get('origin'),
         'method' => $request->method(),
         'datetime' => time(),
@@ -135,13 +159,12 @@ Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, 
     ];
     
     $data = json_decode(Cache::get($uuid), true);
-
     $expireAt = (int) $data['expireAt'] - time();
 
     if (array_key_exists('requests', $data)) {
-        array_unshift($data['requests'], $currentRequest);
+        $data['requests'] = array_merge([$requestUUID => $currentRequest], $data['requests']);
     } else {
-        $data['requests'][] = $currentRequest;
+        $data['requests'][$requestUUID] = $currentRequest;
     }
 
     $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
