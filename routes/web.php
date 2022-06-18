@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FakeRequesterController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -63,120 +64,12 @@ Route::get('/', function (Request $request) {
     return view('welcome', $data);
 });
 
-Route::get('/webhook/requests', function () {
-    $sessionUUID = session()->get('uuid');
-
-    $cache = (array) json_decode(Cache::get($sessionUUID), true);
-    $requests = [];
-
-    if ($cache) {
-        $requests = array_key_exists('requests', $cache) 
-            ? $cache['requests']
-            : [];
-    }
-
-    $data = [];
-    foreach ($requests as $key => $request) {
-        $data[$key] = view('request', ['key' => $key, 'request' => $request])->render();
-    }
-
-    return response()->json($data, 200);
-});
-
-// Generate fake webhook requests
-Route::get('/webhook/generate', function () {
-    $sessionUUID = session()->get('uuid');
-
-    if (!$sessionUUID) {
-        return response('', 200);
-    }
-
-    $client = new GuzzleHttp\Client();
-
-    $methods = [
-        'GET' => 200,
-        'POST' => 201,
-        'PUT' => 204,
-        'PATCH' => 204,
-        'DELETE' => 204
-    ];
-    
-    $options = [
-        'headers' => [
-            'Authorization' => 'Bearer MyTokenTest',
-            'Content-Type' => 'application/json'
-        ],
-        'body' => json_encode([
-            'id' => 123,
-            'status' => 12345
-        ])
-    ];
-
-    $data = [];
-    foreach ($methods as $method => $code) {
-        $url = $_SERVER['HTTP_HOST'] . "/webhook/{$sessionUUID}/{$code}";
-
-        try {
-            $response = $client->request($method, $url, $options);
-            $data[$method] = [
-                'statusCode' => $response->getStatusCode()
-            ];
-        } catch (Exception $e) {
-            $data[$method] = [
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-
-    return response('', 200);
-});
-
-Route::any('/webhook/clear', function () {
-    $sessionUUID = session()->get('uuid');
-
-    if (!Cache::has($sessionUUID)) {
-        return response('', 200);
-    }
-
-    $data = json_decode(Cache::get($sessionUUID), true);
-    $data['requests'] = [];
-    $expireAt = (int) $data['expireAt'] - time();
-    $data['requests'] = [];
-
-    Cache::put($sessionUUID, json_encode($data), $expireAt);
-
-    return response('', 200);
-});
-
-
-Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, $code = 200) {
-    $hasUUID = Cache::has($uuid);
-
-    if (!$hasUUID) {
-        return response('', 200);
-    }
-
-    $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
-
-    $requestUUID = (string) Str::uuid();
-    $currentRequest = [
-        'id' => $requestUUID,
-        'origin' => $request->headers->get('origin'),
-        'method' => $request->method(),
-        'datetime' => time(),
-        'query' => $request->query() ? json_encode($request->query()) : null,
-        'body' => $request->post() ? json_encode($request->post()) : null,
-        'headers' => $request->header() ? json_encode($request->header()) : null,
-        'responseCode' =>  "{$code} - " . JsonResponse::$statusTexts[$code]
-    ];
-    
-    $data = json_decode(Cache::get($uuid), true);
-    $expireAt = (int) $data['expireAt'] - time();
-
-    $data['requests'][$requestUUID] = $currentRequest;
-    
-    Cache::put($uuid, json_encode($data), $expireAt);
-    return response('', $code);
-});
-
+// Fake Request routes
 Route::any('/fakerequest', [FakeRequesterController::class, 'fakeRequest']);
+
+// Webhook routes
+Route::get('/webhook/requests', [WebhookController::class, 'requests']);
+Route::get('/webhook/generate', [WebhookController::class, 'generate']);
+Route::any('/webhook/clear', [WebhookController::class, 'clear']);
+Route::any('/webhook/{uuid}/{code?}', [WebhookController::class, 'store']);
+

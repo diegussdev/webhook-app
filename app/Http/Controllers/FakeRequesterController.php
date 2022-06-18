@@ -13,7 +13,7 @@ class FakeRequesterController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function fakeRequest(Request $request)
+    public function fakeRequest(Request $request): JsonResponse
     {
         $timeout = (int) $request->input('timeout');
     
