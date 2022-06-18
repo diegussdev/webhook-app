@@ -51,7 +51,7 @@
         <div style="max-width: 1024px" class="container-sm text-bg-dark border border-2 border-secondary text-gray shadow p-3 rounded-2 mt-3">
             <div class="container">
                 <div class="d-flex justify-content-between m-0 p-0">
-                    <h4 class="fw-bold">Fake Requester</h4>
+                    <h4 class="fw-bold">Fake Request</h4>
                     <button onclick="copy('{{ $FakeRequester['url'] }}','#fakeRequesterUrl')" class="bg-transparent text-light ml-2 fw-bold" style="cursor: pointer"><i class="fa-solid fa-copy"></i><span class="ml-1" style="font-size: 10px">Copy</span></button>
                 </div>
             </div>

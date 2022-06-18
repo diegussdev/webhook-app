@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FakeRequesterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -178,21 +179,4 @@ Route::any('/webhook/{uuid}/{code?}', function (Request $request, $uuid = null, 
     return response('', $code);
 });
 
-Route::any('/fakerequest', function (Request $request) {    
-    $timeout = (int) $request->input('timeout');
-    
-    if ($timeout) {
-        sleep($timeout);
-    }
-
-    $code = $request->input('code');
-    $code = array_key_exists($code, JsonResponse::$statusTexts) ? $code : 200;
-
-    $response = (array) $request->post();
-
-    if (!$response) {
-        $response = ['data' => "{$code} - " . JsonResponse::$statusTexts[$code]];
-    }
-
-    return response()->json($response, $code);
-});
+Route::any('/fakerequest', [FakeRequesterController::class, 'fakeRequest']);
